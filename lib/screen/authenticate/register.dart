@@ -1,4 +1,5 @@
 import 'package:brew/decoration/constants.dart';
+import 'package:brew/decoration/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:brew/services/auth.dart';
 
@@ -14,13 +15,15 @@ class _RegisterState extends State<Register> {
   final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
 
+  bool loading = false;
+
   String email = '';
   String password = '';
   String error = '';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ? Loading() : Scaffold(
       backgroundColor: Colors.brown[100],
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
@@ -71,10 +74,14 @@ class _RegisterState extends State<Register> {
                     backgroundColor: Colors.brown[600],
                   ),
                   onPressed: () async {
+                    setState(() {
+                      loading = true;
+                    });
                     if (_formKey.currentState?.validate() == true) {
                       dynamic result = await _authService.registerWithEmailAndPassword(email, password);
                       if(result == null){
                         setState(() {
+                          loading = false;
                           error = 'Email provided is not valid';
                         });
                       }
